@@ -1,44 +1,46 @@
 import React, { useEffect } from 'react';
-import PropTypes from 'prop-types';
-import isEqual from 'lodash.isequal';
-import arrRotate from 'arr-rotate';
+// import PropTypes from 'prop-types';
+// import isEqual from 'lodash.isequal';
+import { arrRotate } from './utils';
 import { Box, useStdin } from 'ink';
 import Indicator from './Indicator';
 import Item from './Item';
+// import { string } from 'prop-types';
 
 const ARROW_UP = '\u001B[A';
 const ARROW_DOWN = '\u001B[B';
 const ENTER = '\r';
 
-const SelectInput = React.memo(props => {
-	const propTypes = {
-		items: PropTypes.array,
-		focus: PropTypes.bool,
-		initialIndex: PropTypes.number,
-		indicatorComponent: PropTypes.func,
-		itemComponent: PropTypes.func,
-		limit: PropTypes.number,
-		stdin: PropTypes.object.isRequired,
-		setRawMode: PropTypes.func.isRequired,
-		onSelect: PropTypes.func,
-		onHighlight: PropTypes.func
-	}
+interface SelectInputProps {
+	items: string[],
+	focus: boolean,
+	initialIndex: number,
+	indicatorComponent: typeof Indicator,
+	itemComponent: typeof Item,
+	limit: number,
+	stdin: NodeJS.ReadStream,
+	setRawMode: Function,
+	onSelect: Function,
+	onHighlight: Function
+}
+
+const SelectInput = (props: SelectInputProps) => {
+
 
 
 	function hasLimit() {
 		const { limit, items } = props;
-
 		return typeof limit === 'number' && items.length > limit;
 	}
 
 	function getLimit() {
 		const { limit, items } = props;
-
-		if (hasLimit()) {
+		if (hasLimit() && limit) {
 			return Math.min(limit, items.length);
 		}
 
 		return items.length;
+
 	}
 
 	const [state, setState] = React.useState({ rotateIndex: 0, selectedIndex: props.initialIndex })
@@ -46,27 +48,10 @@ const SelectInput = React.memo(props => {
 	const { items, indicatorComponent, itemComponent } = props;
 	const { rotateIndex, selectedIndex } = state;
 	const limit = getLimit();
-
-	const slicedItems = hasLimit() ? arrRotate(items, rotateIndex).slice(0, limit) : items;
-	return (
-		<Box flexDirection="column">
-			{slicedItems.map((item, index) => {
-				const isSelected = index === selectedIndex;
-
-				return (
-					<Box key={item.key || item.value}>
-						{React.createElement(indicatorComponent, { isSelected })}
-						{React.createElement(itemComponent, { ...item, isSelected })}
-					</Box>
-				);
-			})}
-		</Box>
-	)
-
 	useEffect(() => {
 		const { stdin, setRawMode } = props
 		setRawMode(true)
-		let data = stdin.on('data', handleInput)
+		stdin.on('data', handleInput)
 		return () => {
 			stdin.removeListener('data', handleInput)
 			setRawMode(false)
@@ -82,7 +67,7 @@ const SelectInput = React.memo(props => {
 
 
 
-	const handleInput = data => {
+	const handleInput = (data: string) => {
 		const { items, focus, onSelect, onHighlight } = props
 		const { rotateIndex, selectedIndex } = state;
 		// const hasLimit = hasLimit();
@@ -106,12 +91,12 @@ const SelectInput = React.memo(props => {
 				selectedIndex: nextSelectedIndex
 			});
 
-			const slicedItems = hasLimit ? arrRotate(items, nextRotateIndex).slice(0, limit) : items;
+			const slicedItems = hasLimit() ? arrRotate(items, nextRotateIndex).slice(0, limit) : items;
 			onHighlight(slicedItems[nextSelectedIndex]);
 		}
 		if (s === ARROW_DOWN || s === 'j') {
-			const atLastIndex = selectedIndex === (hasLimit ? limit : items.length) - 1;
-			const nextIndex = (hasLimit ? selectedIndex : 0);
+			const atLastIndex = selectedIndex === (hasLimit() ? limit : items.length) - 1;
+			const nextIndex = (hasLimit() ? selectedIndex : 0);
 			const nextRotateIndex = atLastIndex ? rotateIndex - 1 : rotateIndex;
 			const nextSelectedIndex = atLastIndex ? nextIndex : selectedIndex + 1;
 
@@ -119,15 +104,33 @@ const SelectInput = React.memo(props => {
 				rotateIndex: nextRotateIndex,
 				selectedIndex: nextSelectedIndex
 			});
-			const slicedItems = hasLimit ? arrRotate(items, nextRotateIndex).slice(0, limit) : items;
+			const slicedItems = hasLimit() ? arrRotate(items, nextRotateIndex).slice(0, limit) : items;
 			onHighlight(slicedItems[nextSelectedIndex]);
 		}
 		if (s === ENTER) {
-			const slicedItems = hasLimit ? arrRotate(items, rotateIndex).slice(0, limit) : items;
+			const slicedItems = hasLimit() ? arrRotate(items, rotateIndex).slice(0, limit) : items;
 			onSelect(slicedItems[selectedIndex]);
 		}
+
 	}
-})
+	const slicedItems = hasLimit() ? arrRotate(items, rotateIndex).slice(0, limit) : items;
+	return (
+		<Box flexDirection="column">
+			{slicedItems.map((item, index) => {
+				const isSelected = index === selectedIndex;
+
+				return (
+					<Box key={item.key || item.value}>
+						{React.createElement(indicatorComponent, { isSelected })}
+						{React.createElement(itemComponent, { ...item, isSelected })}
+					</Box>
+				);
+			})}
+		</Box>
+	)
+
+
+}
 
 SelectInput.defaultProps = {
 	items: [],
@@ -282,11 +285,14 @@ SelectInput.defaultProps = {
 // 	}
 // }
 
-const SelectInputWithStdin = React.memo(props => {
+const SelectInputWithStdin = (props: SelectInputProps) => {
 	const { stdin, setRawMode } = useStdin()
-
-	return <SelectInput {...props} stdin={stdin} setRawMode={setRawMode} />
-})
+	if (stdin)
+		return <SelectInput {...props} stdin={stdin} setRawMode={setRawMode} />
+	else
+		throw new Error("Stdin not found");
+		
+}
 export default SelectInputWithStdin
 
 // export default class SelectInputWithStdin extends PureComponent {

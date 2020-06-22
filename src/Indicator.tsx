@@ -3,7 +3,11 @@ import PropTypes from 'prop-types';
 import { Box, Text } from 'ink';
 import figures from 'figures';
 
-const Indicator = ({ isSelected }) => (
+interface IndicatorProps {
+	isSelected?: boolean
+}
+
+const Indicator: React.FC<IndicatorProps> = ({ isSelected = false }) => (
 	<Box marginRight={1}>
 		{isSelected ? (
 			<Text color="blue">

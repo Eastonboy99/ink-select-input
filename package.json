@@ -16,8 +16,7 @@
 	"scripts": {
 		"pretest": "npm run build",
 		"test": "xo && ava && npm run typecheck",
-		"build": "babel src --out-dir=build",
-		"prepare": "npm run build",
+		"build": "tsc",
 		"typecheck": "tsc --noEmit --jsx react index.test-d.tsx"
 	},
 	"files": [
@@ -29,6 +28,7 @@
 		"ink-component"
 	],
 	"dependencies": {
+		"@types/figures": "^3.0.1",
 		"arr-rotate": "^1.0.0",
 		"figures": "^2.0.0",
 		"lodash.isequal": "^4.5.0",
@@ -43,6 +43,7 @@
 		"@babel/core": "^7.3.3",
 		"@babel/plugin-proposal-class-properties": "^7.3.3",
 		"@babel/preset-react": "^7.0.0",
+		"@sindresorhus/tsconfig": "^0.7.0",
 		"@types/react": "^16.8.8",
 		"ava": "*",
 		"babel-eslint": "^10.0.1",
