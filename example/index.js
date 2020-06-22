@@ -1,8 +1,8 @@
 "use strict";
 exports.__esModule = true;
 var React = require("react");
-var __1 = require("../");
 var ink_1 = require("ink");
+var __1 = require("../");
 var App = function () {
     var handleSelect = function (item) {
         // `item` = { label: 'First', value: 'first' }

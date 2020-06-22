@@ -1,12 +1,10 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import {Color} from 'ink';
+import { Text } from 'ink';
 
-const Item = ({isSelected, label}) => (
-	<Color blue={isSelected}>
-		{label}
-	</Color>
-);
+const Item = ({ isSelected, label }) => (isSelected
+	? <Text color='blue'>{label}</Text>
+	: <Text> {label} </Text>);
 
 Item.propTypes = {
 	isSelected: PropTypes.bool,

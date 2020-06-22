@@ -35,7 +35,7 @@
 		"prop-types": "^15.5.10"
 	},
 	"peerDependencies": {
-		"ink": "^2.0.0"
+		"ink": "^3.0.0-1"
 	},
 	"devDependencies": {
 		"@ava/babel-preset-stage-4": "^4.0.0",
@@ -48,7 +48,7 @@
 		"babel-eslint": "^10.0.1",
 		"eslint-config-xo-react": "^0.16.0",
 		"eslint-plugin-react": "^7.1.0",
-		"ink": "^2.0.0",
+		"ink": "^3.0.0-1",
 		"ink-testing-library": "^1.0.0",
 		"react": "^16.8.2",
 		"sinon": "^7.2.7",
